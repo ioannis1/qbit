@@ -19,5 +19,3 @@ c:
 	PGUSER=postgres sudo -E  make  installcheck
 pgxs:
 	vi $(PGXS)
-s:
-	./print
