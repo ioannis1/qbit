@@ -1,0 +1,6 @@
+A=2222.30902
+
+printf "%.2f"  $A
+echo
+printf "%.2g"  $A
+echo
