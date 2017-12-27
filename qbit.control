@@ -1,4 +1,6 @@
 # base36 extension
-comment = 'qbit datatype'
+comment         = 'qbit datatype'
 default_version = '0.1'
-relocatable = true
+relocatable     = true
+requires        = complex
+superuser       = true
