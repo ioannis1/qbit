@@ -1,0 +1,14 @@
+                                                       QUERY PLAN                                                        
+-------------------------------------------------------------------------------------------------------------------------
+ Bitmap Heap Scan on try  (cost=24.45..1286.45 rows=49471 width=16) (actual time=0.096..12.192 rows=49897 loops=1)
+   Recheck Cond: (coin < '(0.500,0.500j)U+(0.500,0.500j)D'::qbit)
+   Rows Removed by Index Recheck: 343
+   Heap Blocks: lossy=320
+   Buffers: shared hit=326
+   ->  Bitmap Index Scan on wave_idx  (cost=0.00..12.08 rows=50000 width=0) (actual time=0.076..0.076 rows=3200 loops=1)
+         Index Cond: (coin < '(0.500,0.500j)U+(0.500,0.500j)D'::qbit)
+         Buffers: shared hit=6
+ Planning time: 0.622 ms
+ Execution time: 16.737 ms
+(10 rows)
+

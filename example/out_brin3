@@ -1,0 +1,12 @@
+                                                      QUERY PLAN                                                       
+-----------------------------------------------------------------------------------------------------------------------
+ Bitmap Heap Scan on try  (cost=12.16..1846.47 rows=10 width=16) (actual time=0.080..0.080 rows=0 loops=1)
+   Recheck Cond: (coin > '(1.00)U+(0.00)D'::qbit)
+   Buffers: shared hit=6
+   ->  Bitmap Index Scan on wave_brin  (cost=0.00..12.15 rows=95785 width=0) (actual time=0.077..0.077 rows=0 loops=1)
+         Index Cond: (coin > '(1.00)U+(0.00)D'::qbit)
+         Buffers: shared hit=6
+ Planning time: 0.550 ms
+ Execution time: 0.136 ms
+(8 rows)
+

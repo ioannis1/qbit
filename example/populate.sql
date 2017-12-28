@@ -5,8 +5,8 @@ SET SEARCH_PATH TO :path,public;
 INSERT INTO try
 SELECT --public.random_string(4)
        i
-     --, ( '('|| i ||','|| i || 'j)U+('|| i || ',' || i ||'j)D'  )::qbit
-      , qbit_new(i,i,i,i)
+     , ( '('|| random() ||','|| random() || 'j)U+('|| random() || ',' || random() ||'j)D'  )::qbit
+      --, qbit_new((100*random()::float, (100*random())::int,(100*random())::int,(100*random())::int) )
 FROM  generate_series(1,100000) a(i);
 
 ANALYZE try;

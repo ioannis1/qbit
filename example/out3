@@ -1,0 +1,10 @@
+                                            QUERY PLAN                                            
+--------------------------------------------------------------------------------------------------
+ Seq Scan on try  (cost=0.00..1887.00 rows=10 width=16) (actual time=9.581..9.581 rows=0 loops=1)
+   Filter: (coin > '(1.00)U+(0.00)D'::qbit)
+   Rows Removed by Filter: 100000
+   Buffers: shared hit=637
+ Planning time: 0.343 ms
+ Execution time: 9.597 ms
+(6 rows)
+

@@ -19,3 +19,5 @@ c:
 	PGUSER=postgres sudo -E  make  installcheck
 pgxs:
 	vi $(PGXS)
+pg:
+	PGOPTIONS=--search_path=wave,public psql lessons

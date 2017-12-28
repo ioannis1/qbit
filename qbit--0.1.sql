@@ -32,7 +32,7 @@ CREATE OR REPLACE FUNCTION qbit_collapse(qbit)
 CREATE TYPE qbit (
    internallength = 16,
    input          = qbit_in,
-   output         = qbit_out_prob,
+   output         = qbit_out,
  --  receive        = qbit_recv,
    --send           = qbit_send,
    alignment      = double

@@ -3,8 +3,9 @@ SET SEARCH_PATH TO  :path,public;
 SET CLIENT_MIN_MESSAGES = 'ERROR';
 begin;
 
-explain (analyze, buffers)
-SELECT wave
-FROM try
-WHERE wave < '(12,2j)U+(3,5j)D'
+set enable_seqscan = off;
 
+explain (analyze, buffers)
+SELECT coin
+FROM try
+WHERE coin  > '(1,1j)U+(0,0j)D'::qbit

@@ -9,8 +9,8 @@ SET CLIENT_MIN_MESSAGES = 'ERROR';
 
 
 CREATE TABLE try (
-    age    int ,
-    wave   qbit
+    id     int ,
+    coin   qbit
 );
 
 
