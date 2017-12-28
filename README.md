@@ -4,6 +4,8 @@ Every qbit is automatically normalised.
 
 SELECT '(1,2j)U+(3,4)D'::qbit                  =>  (0.183,0.365j)U+(0.548,0.730j)D 
 
+SELECT qbit_new(1,2,3,4)                       =>  (0.183,0.365j)U+(0.548,0.730j)D 
+
 # Operations
 
 SELECT  qbit_collapse( '(1,2j)U+(3,4)D' )      =>  either 0 or 1
