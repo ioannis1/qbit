@@ -3,8 +3,10 @@
 #include "utils/builtins.h"
 #include "libpq/pqformat.h"             /* needed for send/recv functions */
 #include <math.h>
+#include "utils/guc.h"
 
 PG_MODULE_MAGIC;
+
 
 typedef struct Complex {
     float4      x;
@@ -16,11 +18,24 @@ typedef struct Qbit {
     Complex      down;
 } Qbit;
 
+PG_FUNCTION_INFO_V1(qbit_new);
+PG_FUNCTION_INFO_V1(qbit_in);
+PG_FUNCTION_INFO_V1(qbit_out);
+PG_FUNCTION_INFO_V1(qbit_out_prob);
+PG_FUNCTION_INFO_V1(qbit_collapse);
+PG_FUNCTION_INFO_V1(qbit_up);
+PG_FUNCTION_INFO_V1(qbit_down);
+PG_FUNCTION_INFO_V1(qbit_cmp);
+PG_FUNCTION_INFO_V1(qbit_less);
+PG_FUNCTION_INFO_V1(qbit_less_equal);
+PG_FUNCTION_INFO_V1(qbit_equal);
+PG_FUNCTION_INFO_V1(qbit_greater_equal);
+PG_FUNCTION_INFO_V1(qbit_greater);
+PG_FUNCTION_INFO_V1(qbit_guc);
 
 
 #define MagSqr(c)  (c.x*c.x) + (c.y*c.y)
 
-PG_FUNCTION_INFO_V1(qbit_new);
 Datum
 qbit_new(PG_FUNCTION_ARGS)
 {
@@ -49,7 +64,6 @@ qbit_new(PG_FUNCTION_ARGS)
     PG_RETURN_POINTER(result);
 }
 
-PG_FUNCTION_INFO_V1(qbit_in);
 
 Datum
 qbit_in(PG_FUNCTION_ARGS)
@@ -83,7 +97,6 @@ qbit_in(PG_FUNCTION_ARGS)
 }
 
 
-PG_FUNCTION_INFO_V1(qbit_out);
 
 Datum
 qbit_out(PG_FUNCTION_ARGS)
@@ -95,7 +108,16 @@ qbit_out(PG_FUNCTION_ARGS)
 }
 
 
-PG_FUNCTION_INFO_V1(qbit_collapse);
+Datum
+qbit_out_prob(PG_FUNCTION_ARGS)
+{
+    Qbit       *q = (Qbit *) PG_GETARG_POINTER(0);
+    char       *result;
+    result = psprintf("(%.2f)U+(%.2f)D", MagSqr(q->up), MagSqr(q->down) );
+    PG_RETURN_CSTRING(result);
+}
+
+
 
 Datum
 qbit_collapse(PG_FUNCTION_ARGS)
@@ -137,7 +159,6 @@ qbit_collapse(PG_FUNCTION_ARGS)
 
 
 
-PG_FUNCTION_INFO_V1(qbit_up);
 
 Datum
 qbit_up(PG_FUNCTION_ARGS)
@@ -148,27 +169,39 @@ qbit_up(PG_FUNCTION_ARGS)
     PG_RETURN_FLOAT4(result );
 }
 
+
+Datum
+qbit_down(PG_FUNCTION_ARGS)
+{
+    Qbit      *q     = (Qbit *) PG_GETARG_POINTER(0);
+    float4    result = MagSqr(q->down);
+
+    PG_RETURN_FLOAT4(result );
+}
+
 static int
 qbit_cmp_internal( Qbit *a, Qbit *b ) 
 {
      float4   amag = MagSqr(a->up),  bmag=MagSqr(b->up);
-     if ( amag < bmag  ) return -1;
+
+ //    if (fabs(amag-bmag) < 0.01) return 0;
+
      if ( amag == bmag ) return 0 ;
+     if ( amag < bmag  ) return -1;
      return 1 ;
 }
 
-PG_FUNCTION_INFO_V1(qbit_cmp);
 Datum
 qbit_cmp(PG_FUNCTION_ARGS)
 {
         Qbit    *a = (Qbit *) PG_GETARG_POINTER(0);
         Qbit    *b = (Qbit *) PG_GETARG_POINTER(1);
-        
+
+        // elog(ERROR, "amag=%f, bmag=%f, fbas = %f", amag, bmag, fabs(amag-bmag) );
         PG_RETURN_INT32( qbit_cmp_internal(a,b) );
 }
 
 
-PG_FUNCTION_INFO_V1(qbit_less);
 
 Datum
 qbit_less(PG_FUNCTION_ARGS)
@@ -180,7 +213,6 @@ qbit_less(PG_FUNCTION_ARGS)
         PG_RETURN_BOOL(false);
 }
 
-PG_FUNCTION_INFO_V1(qbit_less_equal);
 
 Datum
 qbit_less_equal(PG_FUNCTION_ARGS)
@@ -193,7 +225,6 @@ qbit_less_equal(PG_FUNCTION_ARGS)
 }
 
 
-PG_FUNCTION_INFO_V1(qbit_equal);
 
 Datum
 qbit_equal(PG_FUNCTION_ARGS)
@@ -205,7 +236,6 @@ qbit_equal(PG_FUNCTION_ARGS)
         PG_RETURN_BOOL(false);
 }
 
-PG_FUNCTION_INFO_V1(qbit_greater_equal);
 
 Datum
 qbit_greater_equal(PG_FUNCTION_ARGS)
@@ -217,10 +247,19 @@ qbit_greater_equal(PG_FUNCTION_ARGS)
         PG_RETURN_BOOL(false);
 }
 
-PG_FUNCTION_INFO_V1(qbit_greater);
 
 Datum
 qbit_greater(PG_FUNCTION_ARGS)
+{
+        Qbit    *a = (Qbit *) PG_GETARG_POINTER(0);
+        Qbit    *b = (Qbit *) PG_GETARG_POINTER(1);
+        
+        if (qbit_cmp_internal(a,b) > 0 ) PG_RETURN_BOOL(true);
+        PG_RETURN_BOOL(false);
+}
+
+Datum
+qbit_guc(PG_FUNCTION_ARGS)
 {
         Qbit    *a = (Qbit *) PG_GETARG_POINTER(0);
         Qbit    *b = (Qbit *) PG_GETARG_POINTER(1);
