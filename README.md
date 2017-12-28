@@ -17,12 +17,12 @@ SELECT  qbit_up( '(1,2j)U+(3,4)D' )            =>  0.166667      probability  fo
 
 SELECT qbit_cmp('(1,2j)U+(3,4)D' , '(2,2j)U+(1,2j)D' )         =>   -1
 
-SELECT '(1,2j)U+(3,4)D' <   '(2,2j)U+(1,2j)D                   =>   true
+SELECT '(1,2j)U+(3,4)D' <   '(2,2j)U+(1,2j)D'::qbit            =>   true
 
-SELECT '(1,2j)U+(3,4)D' <=  '(2,2j)U+(1,2j)D                   =>   true
+SELECT '(1,2j)U+(3,4)D' <=  '(2,2j)U+(1,2j)D'::qbit            =>   true
 
-SELECT '(1,2j)U+(3,4)D' > '(2,2j)U+(1,2j)D'                    =>   false
+SELECT '(1,2j)U+(3,4)D' > '(2,2j)U+(1,2j)D'::qbit              =>   false
 
-SELECT '(1,2j)U+(3,4)D' >= '(2,2j)U+(1,2j)D'                   =>   false
+SELECT '(1,2j)U+(3,4)D' >= '(2,2j)U+(1,2j)D'::qbit             =>   false
 
-SELECT '(1,2j)U+(3,4)D' = '(1,2j)U+(3,4j)D' 
+SELECT '(1,2j)U+(3,4)D' = '(1,2j)U+(3,4j)D'::qbit              =>  true
