@@ -3,22 +3,27 @@
 
 CREATE TYPE qbit;
 
-CREATE FUNCTION qbit_in(cstring)
+CREATE OR REPLACE FUNCTION qbit_in(cstring)
     RETURNS qbit
     AS '$libdir/qbit'
     LANGUAGE C IMMUTABLE STRICT;
 
-CREATE FUNCTION qbit_out(qbit)
+CREATE OR REPLACE FUNCTION qbit_out(qbit)
     RETURNS cstring
     AS '$libdir/qbit'
     LANGUAGE C IMMUTABLE STRICT;
 
-CREATE FUNCTION qbit_new(float4,float4,float4,float4)
+CREATE OR REPLACE FUNCTION qbit_out_prob(qbit)
+    RETURNS cstring
+    AS '$libdir/qbit'
+    LANGUAGE C IMMUTABLE STRICT;
+
+CREATE OR REPLACE FUNCTION qbit_new(float4,float4,float4,float4)
     RETURNS qbit
     AS '$libdir/qbit'
     LANGUAGE C IMMUTABLE STRICT;
 
-CREATE FUNCTION qbit_collapse(qbit)
+CREATE OR REPLACE FUNCTION qbit_collapse(qbit)
     RETURNS int
     AS '$libdir/qbit'
     LANGUAGE C STRICT;
@@ -27,7 +32,7 @@ CREATE FUNCTION qbit_collapse(qbit)
 CREATE TYPE qbit (
    internallength = 16,
    input          = qbit_in,
-   output         = qbit_out,
+   output         = qbit_out_prob,
  --  receive        = qbit_recv,
    --send           = qbit_send,
    alignment      = double
@@ -35,23 +40,23 @@ CREATE TYPE qbit (
 
 
 /*
-CREATE FUNCTION qbit_recv(internal)
+CREATE OR REPLACE FUNCTION qbit_recv(internal)
    RETURNS qbit
     AS '$libdir/qbit'
    LANGUAGE C IMMUTABLE STRICT;
 
-CREATE FUNCTION qbit_send(qbit)
+CREATE OR REPLACE FUNCTION qbit_send(qbit)
    RETURNS bytea
     AS '$libdir/qbit'
    LANGUAGE C IMMUTABLE STRICT;
 */
 
-CREATE FUNCTION qbit_up(qbit)
+CREATE OR REPLACE FUNCTION qbit_up(qbit)
    RETURNS float4
     AS '$libdir/qbit'
    LANGUAGE C IMMUTABLE STRICT;
 
-CREATE FUNCTION qbit_cmp(qbit,qbit)
+CREATE OR REPLACE FUNCTION qbit_cmp(qbit,qbit)
    RETURNS int
     AS '$libdir/qbit'
    LANGUAGE C IMMUTABLE STRICT;
