@@ -1,3 +1,5 @@
+Every qbit is automatically normalised.
+
 # Constructors
 
 SELECT '(1,2j)U+(3,4)D'::qbit                  =>  (0.183,0.365j)U+(0.548,0.730j)D 
