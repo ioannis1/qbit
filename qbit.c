@@ -1,40 +1,4 @@
-#include "postgres.h"
-#include "fmgr.h"
-#include "utils/builtins.h"
-#include "libpq/pqformat.h"             /* needed for send/recv functions */
-#include <math.h>
-#include "utils/guc.h"
-
-PG_MODULE_MAGIC;
-
-
-typedef struct Complex {
-    float4      x;
-    float4      y;
-} Complex;
-
-typedef struct Qbit {
-    Complex      up;
-    Complex      down;
-} Qbit;
-
-PG_FUNCTION_INFO_V1(qbit_new);
-PG_FUNCTION_INFO_V1(qbit_in);
-PG_FUNCTION_INFO_V1(qbit_out);
-PG_FUNCTION_INFO_V1(qbit_out_prob);
-PG_FUNCTION_INFO_V1(qbit_collapse);
-PG_FUNCTION_INFO_V1(qbit_up);
-PG_FUNCTION_INFO_V1(qbit_down);
-PG_FUNCTION_INFO_V1(qbit_cmp);
-PG_FUNCTION_INFO_V1(qbit_less);
-PG_FUNCTION_INFO_V1(qbit_less_equal);
-PG_FUNCTION_INFO_V1(qbit_equal);
-PG_FUNCTION_INFO_V1(qbit_greater_equal);
-PG_FUNCTION_INFO_V1(qbit_greater);
-PG_FUNCTION_INFO_V1(qbit_guc);
-
-
-#define MagSqr(c)  (c.x*c.x) + (c.y*c.y)
+#include "qbit.h"
 
 Datum
 qbit_new(PG_FUNCTION_ARGS)
@@ -77,8 +41,7 @@ qbit_in(PG_FUNCTION_ARGS)
     if (sscanf(str, " (%f,%fj)U+(%f,%fj)D ", &a1, &a2, &b1, &b2) != 4)
         ereport(ERROR,
                 (errcode(ERRCODE_INVALID_TEXT_REPRESENTATION),
-                 errmsg("invalid input syntax for qbit: \"%s\"",
-                        str)));
+                 errmsg("valid syntax is \"(2,3j)U+(1,2j)D\"")));
 
     result  =  (Qbit*) palloc(sizeof(Qbit));
 
@@ -103,19 +66,23 @@ qbit_out(PG_FUNCTION_ARGS)
 {
     Qbit       *q = (Qbit *) PG_GETARG_POINTER(0);
     char       *result;
-    result = psprintf("(%.3f,%.3fj)U+(%.3f,%.3fj)D", q->up.x, q->up.y, q->down.x, q->down.y);
+    float4     a_angle, b_angle;
+
+    if (! strcmp( GetConfigOption("qbit.style",true,false), "probability") ) {
+        result = psprintf("(%.2f)U+(%.2f)D", MagSqr(q->up), MagSqr(q->down) );
+    } else if (! strcmp( GetConfigOption("qbit.style",true,false), "polar") ) {
+               a_angle  =  (180/3.14159)* atan(q->up.y/q->up.x);
+               b_angle  =  (180/3.14159)* atan(q->down.y/q->down.x);
+ 
+        result = psprintf("%.2f<%.2f>U+%.2f<%.2f>D",
+                 Mag(q->up), a_angle, Mag(q->down), b_angle );
+    }else{
+        result = psprintf("(%.3f,%.3fj)U+(%.3f,%.3fj)D", q->up.x, q->up.y, q->down.x, q->down.y);
+    }
     PG_RETURN_CSTRING(result);
 }
 
 
-Datum
-qbit_out_prob(PG_FUNCTION_ARGS)
-{
-    Qbit       *q = (Qbit *) PG_GETARG_POINTER(0);
-    char       *result;
-    result = psprintf("(%.2f)U+(%.2f)D", MagSqr(q->up), MagSqr(q->down) );
-    PG_RETURN_CSTRING(result);
-}
 
 
 
@@ -157,27 +124,48 @@ qbit_collapse(PG_FUNCTION_ARGS)
 }
 */
 
+static float4
+qbit_up_internal(Qbit *q) 
+{
+    Complex       up ;
+    const char   *guc ;
+    float4        longitude,  latitude;
+    //float4        angle;
+
+    guc  = GetConfigOption("qbit.geo",true,false);
+
+    if (NULL != guc) {
+         if (sscanf(guc, "%g N  / %g W", &latitude, &longitude) != 2) 
+                  elog(ERROR, "expected qbit.geo=\'47 N / 122 W\' \n");
+    }else{
+         latitude = 90;
+    }
 
 
+     up.x   = sqrt( (q->up.x * q->up.x) + (q->up.y*q->up.y)  );
+     //up.y   =  (180/3.14159)* atan(up.y/up.x);
+
+     //angle   = latitude - up.y;
+     //return cos (angle * (3.14159/180) );
+     //return MAG_SQUARED(q->up);
+     return up.x;
+}
 
 Datum
 qbit_up(PG_FUNCTION_ARGS)
-{
-    Qbit      *q     = (Qbit *) PG_GETARG_POINTER(0);
-    float4    result = MagSqr(q->up);
-
-    PG_RETURN_FLOAT4(result );
+{ 
+    Qbit   *q     = (Qbit *) PG_GETARG_POINTER(0);
+    PG_RETURN_FLOAT4( qbit_up_internal(q) );
 }
-
 
 Datum
 qbit_down(PG_FUNCTION_ARGS)
-{
-    Qbit      *q     = (Qbit *) PG_GETARG_POINTER(0);
-    float4    result = MagSqr(q->down);
-
-    PG_RETURN_FLOAT4(result );
+{ 
+    Qbit   *q     = (Qbit *) PG_GETARG_POINTER(0);
+    PG_RETURN_FLOAT4(1 - qbit_up_internal(q) );
 }
+
+
 
 static int
 qbit_cmp_internal( Qbit *a, Qbit *b ) 
@@ -197,7 +185,6 @@ qbit_cmp(PG_FUNCTION_ARGS)
         Qbit    *a = (Qbit *) PG_GETARG_POINTER(0);
         Qbit    *b = (Qbit *) PG_GETARG_POINTER(1);
 
-        // elog(ERROR, "amag=%f, bmag=%f, fbas = %f", amag, bmag, fabs(amag-bmag) );
         PG_RETURN_INT32( qbit_cmp_internal(a,b) );
 }
 
