@@ -97,32 +97,6 @@ qbit_collapse(PG_FUNCTION_ARGS)
     }
     PG_RETURN_INT32(0);
 }
-/*
-Datum
-qbit_collapse(PG_FUNCTION_ARGS)
-{
-    Qbit      *q     = (Qbit *) PG_GETARG_POINTER(0);
-    int32     random = rand()%100;
-    int32    up_size = VARSIZE_ANY_EXHDR("UP");
-    int32    down_size = VARSIZE_ANY_EXHDR("DOWN");
-    int32    text_size ;
-    text     *msg;
-
-
-    if (random < ( MagSqr(q->up))) {
-            text_size = up_size + VARHDRSZ;
-            msg       = (text *) palloc(text_size);
-            SET_VARSIZE( msg, text_size);
-            memcpy(VARDATA(msg) + down_size, VARDATA_ANY("UP"), up_size);
-            PG_RETURN_TEXT_P(msg);
-    }
-    text_size = down_size + VARHDRSZ;
-    msg       = (text *) palloc(text_size);
-    SET_VARSIZE( msg, text_size);
-    memcpy(VARDATA(msg), VARDATA_ANY("DOWN"), down_size);
-    PG_RETURN_TEXT_P(msg);
-}
-*/
 
 static float4
 qbit_up_internal(Qbit *q) 
@@ -135,8 +109,8 @@ qbit_up_internal(Qbit *q)
     guc  = GetConfigOption("qbit.geo",true,false);
 
     if (NULL != guc) {
-         if (sscanf(guc, "%g N  / %g W", &latitude, &longitude) != 2) 
-                  elog(ERROR, "expected qbit.geo=\'47 N / 122 W\' \n");
+         if (sscanf(guc, "%f N  / %f W", &latitude, &longitude) != 2) 
+                  elog(ERROR, "expected something like qbit.geo=\'47 N / 122 W\' \n");
     }else{
          latitude = 90;
     }
