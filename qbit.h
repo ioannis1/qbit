@@ -1,3 +1,5 @@
+// COPYRIGHT (c) Ioannis Tambouras 2011-2015
+
 #ifndef _QBIT
 #define _QBIT
 

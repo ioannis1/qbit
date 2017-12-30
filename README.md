@@ -1,3 +1,5 @@
+# COPYRIGHT (c) Ioannis Tambouras 2011-2015
+
 Every qbit is automatically normalised.
 Set the GUC parameter qbit.style='probability' to show probabilities instead of  complex coefficients.
 Set the GUC parameter qbit.style='polar' to show complex coefficients in polar form.

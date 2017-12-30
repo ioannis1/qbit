@@ -1,3 +1,5 @@
+# COPYRIGHT (c) Ioannis Tambouras 2011-2015
+
 EXTENSION = qbit             # the extensions name
 DATA      = qbit--0.1.sql 
 REGRESS   = qbit_test        # our test script file (without extension)

@@ -1,4 +1,5 @@
--- complain if script is sourced in psql, rather than via CREATE EXTENSION
+--  COPYRIGHT (c) Ioannis Tambouras 2011-2015
+
 \echo Use "CREATE EXTENSION qbit" to load this file. \quit
 
 CREATE TYPE qbit;
@@ -52,6 +53,11 @@ CREATE OR REPLACE FUNCTION qbit_send(qbit)
 */
 
 CREATE OR REPLACE FUNCTION qbit_up(qbit)
+   RETURNS float4
+    AS '$libdir/qbit'
+   LANGUAGE C IMMUTABLE STRICT;
+
+CREATE OR REPLACE FUNCTION qbit_down(qbit)
    RETURNS float4
     AS '$libdir/qbit'
    LANGUAGE C IMMUTABLE STRICT;
