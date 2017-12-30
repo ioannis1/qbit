@@ -1,3 +1,5 @@
+-- COPYRIGHT (c) Ioannis Tambouras 2011-2015
+
 CREATE EXTENSION qbit;
 
 SELECT '[1,2U __ 2,3D']::qbit;
