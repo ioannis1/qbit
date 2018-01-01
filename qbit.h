@@ -35,7 +35,7 @@ PG_FUNCTION_INFO_V1(qbit_less_equal);
 PG_FUNCTION_INFO_V1(qbit_equal);
 PG_FUNCTION_INFO_V1(qbit_greater_equal);
 PG_FUNCTION_INFO_V1(qbit_greater);
-PG_FUNCTION_INFO_V1(qbit_guc);
+PG_FUNCTION_INFO_V1(qbit_ket);
 
 
 

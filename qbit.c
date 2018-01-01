@@ -222,13 +222,18 @@ qbit_greater(PG_FUNCTION_ARGS)
 }
 
 Datum
-qbit_guc(PG_FUNCTION_ARGS)
+qbit_ket(PG_FUNCTION_ARGS)
 {
         Qbit    *a = (Qbit *) PG_GETARG_POINTER(0);
-        Qbit    *b = (Qbit *) PG_GETARG_POINTER(1);
-        
-        if (qbit_cmp_internal(a,b) > 0 ) PG_RETURN_BOOL(true);
-        PG_RETURN_BOOL(false);
+        Qbit    *result;
+
+        result  = (Qbit *) palloc(sizeof(Qbit));
+        result->up.x    =  a->up.x ;
+        result->up.y    = -1 * a->up.y ;
+        result->down.x  =  a->up.x ;
+        result->down.y  = -1 * a->down.y ;
+
+        PG_RETURN_POINTER(result);
 }
 /*
 PG_FUNCTION_INFO_V1(qbit_recv);

@@ -14,10 +14,11 @@ CREATE OR REPLACE FUNCTION qbit_out(qbit)
     AS '$libdir/qbit'
     LANGUAGE C IMMUTABLE STRICT;
 
-CREATE OR REPLACE FUNCTION qbit_out_prob(qbit)
-    RETURNS cstring
+CREATE OR REPLACE FUNCTION qbit_ket(qbit)
+    RETURNS qbit
     AS '$libdir/qbit'
     LANGUAGE C IMMUTABLE STRICT;
+
 
 CREATE OR REPLACE FUNCTION qbit_new(float4,float4,float4,float4)
     RETURNS qbit
