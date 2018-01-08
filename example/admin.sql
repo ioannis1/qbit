@@ -2,6 +2,10 @@
 SET SEARCH_PATH TO :path;
 SET CLIENT_MIN_MESSAGES = 'ERROR';
 
+
+CREATE INDEX wave_gin ON bank USING gin (coin ) ;
+
+\q
 DROP INDEX IF EXISTS wave_btree; 
 DROP INDEX IF EXISTS wave_brin; 
 

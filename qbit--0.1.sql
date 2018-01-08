@@ -172,6 +172,21 @@ CREATE OPERATOR CLASS qbit_minimax_ops DEFAULT FOR TYPE qbit USING brin AS
         OPERATOR 4 >= ,
         OPERATOR 5 > ;
 
+CREATE OR REPLACE FUNCTION gin_extract_value_qbit(qbit,internal)
+    RETURNS internal
+    AS '$libdir/qbit'
+    LANGUAGE C IMMUTABLE STRICT;
+
+CREATE OR REPLACE FUNCTION gin_extract_query_qbit(qbit, internal, int2, internal, internal)
+    RETURNS internal
+    AS '$libdir/qbit'
+    LANGUAGE C IMMUTABLE STRICT;
+
+CREATE OR REPLACE FUNCTION gin_consistent_qbit(internal, int2, anyelement, int4, internal, internal)
+    RETURNS bool
+    AS '$libdir/qbit'
+    LANGUAGE C IMMUTABLE STRICT;
+
 CREATE OPERATOR CLASS qbit_gin_ops DEFAULT FOR TYPE qbit USING gin AS
    OPERATOR         1       <,
     OPERATOR        2       <=,

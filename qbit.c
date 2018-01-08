@@ -55,7 +55,7 @@ gin_extract_query_qbit(PG_FUNCTION_ARGS)
                              *nentries   += 1;
                      }
                      break;
-            case 4 : size     =   91 - ((int) round(100*qbit_up_internal(query) ));
+            case 4 : size     =   101 - ((int) round(100*qbit_up_internal(query) ));
                      items = (Datum *) palloc(sizeof(Datum)* size);
 
                      for (int i=(int)round(100*qbit_up_internal(query));i<=90; i++)  {
@@ -63,7 +63,7 @@ gin_extract_query_qbit(PG_FUNCTION_ARGS)
                              *nentries   += 1;
                      }
                      break;
-            case 5 : size     =   91 - ((int) round(100*qbit_up_internal(query) ));
+            case 5 : size     =   101 - ((int) round(100*qbit_up_internal(query) ));
                      items = (Datum *) palloc(sizeof(Datum)* size);
 
                      for (int i=((int)round(100*qbit_up_internal(query)))+1;i<=90; i++)  {

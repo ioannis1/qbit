@@ -4,8 +4,12 @@ SET CLIENT_MIN_MESSAGES = 'ERROR';
 begin;
 
 --set enable_seqscan = off;
+set qbit.style = 'polar';
 
 EXPLAIN (analyze, buffers)
 SELECT coin
 FROM bank
-WHERE coin  > '(1,1j)U+(0,0j)D'::qbit
+WHERE coin  >= '(0.580,0.20j)U+(0.0,0.2j)D'::qbit
+ORDER BY coin
+
+
