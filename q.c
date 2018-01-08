@@ -2,90 +2,6 @@
 
 #include "qbit.h"
 
-
-Datum
-gin_extract_value_qbit(PG_FUNCTION_ARGS)
-{
-        Qbit       *item     = (Qbit *)  PG_GETARG_POINTER(0);
-        int32      *nentries = (int32 *)  PG_GETARG_POINTER(1);
-        Datum      *entries  = (Datum *) palloc(sizeof(Datum) * 1);
-	int32      upness;
-
-	upness     = 100*qbit_up_internal(item);
-        entries[0] = Int32GetDatum( round(upness) );
-        *nentries  = 1;
-        PG_RETURN_POINTER(entries);
-}
-
-Datum
-create_elem(int32 i)
-{
-      PG_RETURN_INT32(i);
-}
-
-Datum
-gin_extract_query_qbit(PG_FUNCTION_ARGS)
-{
-        Qbit           *query    = (Qbit *)  PG_GETARG_POINTER(0);
-        int32          *nentries = (int32 *) PG_GETARG_POINTER(1);
-        Datum           *items ;
-        int32           size;
-        StrategyNumber  strategy = PG_GETARG_UINT16(2);
-
-        *nentries   = 0;
-        switch (strategy)
-        {
-            case 3 : items = (Datum *) palloc(sizeof(Datum));
-                     items[0]  = create_elem( round( (int) round( 100*qbit_up_internal(query) )));
-                     *nentries   = 1;
-                     break;
-            case 2 : size     =   1 + ((int) round( 100*qbit_up_internal(query) ));
-                     items = (Datum *) palloc(sizeof(Datum)* size);
-
-                     for (int i=0;i<= (int) round( 100*qbit_up_internal(query) ); i++)  {
-                              items[i] = create_elem( (int) i);
-                             *nentries   += 1;
-                     }
-                     break;
-            case 1 : size     =  1 + ((int) round(100*qbit_up_internal(query) ));
-                     items = (Datum *) palloc(sizeof(Datum)* size);
-
-                     for (int i=0;i< (int) round(100*qbit_up_internal(query)); i++)  {
-                              items[i] = create_elem( (int) i);
-                             *nentries   += 1;
-                     }
-                     break;
-            case 4 : size     =   91 - ((int) round(100*qbit_up_internal(query) ));
-                     items = (Datum *) palloc(sizeof(Datum)* size);
-
-                     for (int i=(int)round(100*qbit_up_internal(query));i<=90; i++)  {
-                              items[*nentries] = create_elem( (int) i);
-                             *nentries   += 1;
-                     }
-                     break;
-            case 5 : size     =   91 - ((int) round(100*qbit_up_internal(query) ));
-                     items = (Datum *) palloc(sizeof(Datum)* size);
-
-                     for (int i=((int)round(100*qbit_up_internal(query)))+1;i<=90; i++)  {
-                              items[*nentries] = create_elem( (int) i);
-                             *nentries   += 1;
-                     }
-                     break;
-
-        }
-        PG_RETURN_POINTER(items);
-}
-
-Datum
-gin_consistent_qbit(PG_FUNCTION_ARGS)
-{
-        bool           *recheck = (bool *) PG_GETARG_POINTER(5);
-
-        *recheck = false;
-        PG_RETURN_BOOL(true);
-}
-
-
 Datum
 qbit_new(PG_FUNCTION_ARGS)
 {
@@ -202,8 +118,7 @@ qbit_up_internal(Qbit *q)
     }
 
 
-     up.x   =  (q->up.x * q->up.x) + (q->up.y*q->up.y)  ;
-     //up.x   = sqrt( (q->up.x * q->up.x) + (q->up.y*q->up.y)  );
+     up.x   = sqrt( (q->up.x * q->up.x) + (q->up.y*q->up.y)  );
      //up.y   =  (180/3.14159)* atan(up.y/up.x);
 
      //angle   = latitude - up.y;
@@ -306,20 +221,6 @@ qbit_greater(PG_FUNCTION_ARGS)
         PG_RETURN_BOOL(false);
 }
 
-Datum
-qbit_ket(PG_FUNCTION_ARGS)
-{
-        Qbit    *a = (Qbit *) PG_GETARG_POINTER(0);
-        Qbit    *result;
-
-        result  = (Qbit *) palloc(sizeof(Qbit));
-        result->up.x    =  a->up.x ;
-        result->up.y    = -1 * a->up.y ;
-        result->down.x  =  a->up.x ;
-        result->down.y  = -1 * a->down.y ;
-
-        PG_RETURN_POINTER(result);
-}
 /*
 PG_FUNCTION_INFO_V1(qbit_recv);
 Datum

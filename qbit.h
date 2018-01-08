@@ -9,7 +9,9 @@
 #include "libpq/pqformat.h"             /* needed for send/recv functions */
 #include <math.h>
 #include "utils/guc.h"
+#include "access/stratnum.h"
 #include "../complex/complex.h"
+
 
 //PG_MODULE_MAGIC;
 
@@ -36,6 +38,11 @@ PG_FUNCTION_INFO_V1(qbit_equal);
 PG_FUNCTION_INFO_V1(qbit_greater_equal);
 PG_FUNCTION_INFO_V1(qbit_greater);
 PG_FUNCTION_INFO_V1(qbit_ket);
+PG_FUNCTION_INFO_V1(gin_extract_query_qbit);
+PG_FUNCTION_INFO_V1(gin_extract_value_qbit);
+PG_FUNCTION_INFO_V1(gin_consistent_qbit);
+Datum create_elem(int32);
+static float4 qbit_up_internal(Qbit *) ;
 
 
 

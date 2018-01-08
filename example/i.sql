@@ -3,9 +3,9 @@ SET SEARCH_PATH TO  :path,public;
 SET CLIENT_MIN_MESSAGES = 'ERROR';
 begin;
 
-set enable_seqscan = off;
+--set enable_seqscan = off;
 
-explain (analyze, buffers)
+EXPLAIN (analyze, buffers)
 SELECT coin
-FROM try
+FROM bank
 WHERE coin  > '(1,1j)U+(0,0j)D'::qbit

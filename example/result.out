@@ -1,0 +1,20 @@
+Bitmap Heap Scan on bank  (cost=16.84..12949.95 rows=100 width=16) (actual time=0.143..0.143 rows=0 loops=1)
+   Recheck Cond: (coin > '(0.707,0.707j)U+(0.000,0.000j)D'::qbit)
+   Buffers: shared hit=3
+   ->  Bitmap Index Scan on wave_brin  (cost=0.00..16.82 rows=602169 width=0) (actual time=0.140..0.140 rows=0 loops=1)
+         Index Cond: (coin > '(0.707,0.707j)U+(0.000,0.000j)D'::qbit)
+         Buffers: shared hit=3
+ Planning time: 0.091 ms
+ Execution time: 0.175 ms
+(8 rows)
+
+=> DROP INDEX wave_brin ;
+=> EXPLAIN (analyze, buffers)
+     > SELECT coin FROM bank WHERE coin  > '(1,1j)U+(0,0j)D'::qbit
+     > ;
+                                                      QUERY PLAN
+-----------------------------------------------------------------------------------------------------------------------
+ Seq Scan on bank  (cost=10000000000.00..10000017906.00 rows=100 width=16) (actual time=74.503..74.503 rows=0 loops=1)
+
+520.979 faster
+

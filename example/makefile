@@ -13,7 +13,7 @@ conn = -d "host=$(host) port=$(port) dbname=$(db) user=$(user) "
 conn = -h       $(host) -d   $(port)  -d    $(db)  -U  $(user) 
 
 
-opt = '--search_path=wave'
+opt = '--search_path=wave,public'
 
 
 des dew det d dt dx di:

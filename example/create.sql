@@ -8,8 +8,7 @@ SET SEARCH_PATH TO :path,public;
 SET CLIENT_MIN_MESSAGES = 'ERROR';
 
 
-CREATE TABLE try (
-    id     int ,
+CREATE TABLE bank (
     coin   qbit
 );
 

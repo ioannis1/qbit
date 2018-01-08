@@ -157,8 +157,7 @@ CREATE OPERATOR CLASS qbit_ops DEFAULT FOR TYPE qbit USING btree AS
         OPERATOR 3 =  ,
         OPERATOR 4 >= ,
         OPERATOR 5 >  ,
-        FUNCTION 1  qbit_cmp(qbit,qbit)
-;
+        FUNCTION 1  qbit_cmp(qbit,qbit) ;
 
 
 
@@ -171,5 +170,17 @@ CREATE OPERATOR CLASS qbit_minimax_ops DEFAULT FOR TYPE qbit USING brin AS
         OPERATOR 2 <= ,
         OPERATOR 3 =  ,
         OPERATOR 4 >= ,
-        OPERATOR 5 >
-;
+        OPERATOR 5 > ;
+
+CREATE OPERATOR CLASS qbit_gin_ops DEFAULT FOR TYPE qbit USING gin AS
+   OPERATOR         1       <,
+    OPERATOR        2       <=,
+    OPERATOR        3       =,
+    OPERATOR        4       >=,
+    OPERATOR        5       >,
+    FUNCTION        1       pg_catalog.btint4cmp(integer,integer),
+    FUNCTION        2       gin_extract_value_qbit(qbit, internal),
+    FUNCTION        3       gin_extract_query_qbit(qbit, internal, int2, internal, internal),
+    FUNCTION        4       gin_consistent_qbit(internal, int2, anyelement, int4, internal, internal),
+STORAGE         int4;
+
