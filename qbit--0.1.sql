@@ -73,23 +73,40 @@ CREATE OR REPLACE FUNCTION qbit_equal(qbit,qbit)
     RETURNS boolean
     AS '$libdir/qbit'
     LANGUAGE C IMMUTABLE STRICT;
-
 CREATE OR REPLACE FUNCTION qbit_less(qbit,qbit)
     RETURNS boolean
     AS '$libdir/qbit'
     LANGUAGE C IMMUTABLE STRICT;
-
 CREATE OR REPLACE FUNCTION qbit_less_equal(qbit,qbit)
     RETURNS boolean
     AS '$libdir/qbit'
     LANGUAGE C IMMUTABLE STRICT;
-
 CREATE OR REPLACE FUNCTION qbit_greater_equal(qbit,qbit)
     RETURNS boolean
     AS '$libdir/qbit'
     LANGUAGE C IMMUTABLE STRICT;
-
 CREATE OR REPLACE FUNCTION qbit_greater(qbit,qbit)
+    RETURNS boolean
+    AS '$libdir/qbit'
+    LANGUAGE C IMMUTABLE STRICT;
+
+CREATE OR REPLACE FUNCTION qbit_upness_equal(qbit,int4)
+    RETURNS boolean
+    AS '$libdir/qbit'
+    LANGUAGE C IMMUTABLE STRICT;
+CREATE OR REPLACE FUNCTION qbit_upness_less(qbit,int4)
+    RETURNS boolean
+    AS '$libdir/qbit'
+    LANGUAGE C IMMUTABLE STRICT;
+CREATE OR REPLACE FUNCTION qbit_upness_less_equal(qbit,int4)
+    RETURNS boolean
+    AS '$libdir/qbit'
+    LANGUAGE C IMMUTABLE STRICT;
+CREATE OR REPLACE FUNCTION qbit_upness_greater_equal(qbit,int4)
+    RETURNS boolean
+    AS '$libdir/qbit'
+    LANGUAGE C IMMUTABLE STRICT;
+CREATE OR REPLACE FUNCTION qbit_upness_greater(qbit,int4)
     RETURNS boolean
     AS '$libdir/qbit'
     LANGUAGE C IMMUTABLE STRICT;
@@ -112,7 +129,6 @@ CREATE OPERATOR < (
     restrict   = scalarltsel,
     join       = scalarltjoinsel
 );
-
 CREATE OPERATOR <= (
     leftarg    = qbit,
     rightarg   = qbit,
@@ -121,7 +137,6 @@ CREATE OPERATOR <= (
     restrict   = scalarltsel,
     join       = scalarltjoinsel
 );
-
 CREATE OPERATOR = (
     leftarg    = qbit,
     rightarg   = qbit,
@@ -130,8 +145,6 @@ CREATE OPERATOR = (
     restrict   = eqsel,
     join       = eqjoinsel
 );
-
-
 CREATE OPERATOR >= (
     leftarg    = qbit,
     rightarg   = qbit,
@@ -140,11 +153,52 @@ CREATE OPERATOR >= (
     restrict   = scalargtsel,
     join       = scalargtjoinsel
 );
-
 CREATE OPERATOR > (
     leftarg    = qbit,
     rightarg   = qbit,
     procedure  = qbit_greater,
+    commutator = < ,
+    restrict   = scalargtsel,
+    join       = scalargtjoinsel
+);
+
+CREATE OPERATOR < (
+    leftarg    = qbit,
+    rightarg   = int4,
+    procedure  = qbit_upness_less,
+    commutator = >  ,
+    restrict   = scalarltsel,
+    join       = scalarltjoinsel
+);
+CREATE OPERATOR <= (
+    leftarg    = qbit,
+    rightarg   = int4,
+    procedure  = qbit_upness_less_equal,
+    commutator = >=  ,
+    restrict   = scalarltsel,
+    join       = scalarltjoinsel
+);
+CREATE OPERATOR = (
+    leftarg    = qbit,
+    rightarg   = int4,
+    procedure  = qbit_upness_equal,
+    commutator = = ,
+    restrict   = eqsel,
+    join       = eqjoinsel
+);
+CREATE OPERATOR >= (
+    leftarg    = qbit,
+    rightarg   = int4,
+    procedure  = qbit_upness_greater_equal,
+    commutator = <= ,
+    restrict   = scalargtsel,
+    join       = scalargtjoinsel
+);
+
+CREATE OPERATOR > (
+    leftarg    = qbit,
+    rightarg   = int4,
+    procedure  = qbit_upness_greater,
     commutator = < ,
     restrict   = scalargtsel,
     join       = scalargtjoinsel
@@ -177,6 +231,10 @@ CREATE OR REPLACE FUNCTION gin_extract_value_qbit(qbit,internal)
     AS '$libdir/qbit'
     LANGUAGE C IMMUTABLE STRICT;
 
+CREATE OR REPLACE FUNCTION gin_extract_query_int4(qbit, internal, int2, internal, internal)
+    RETURNS internal
+    AS '$libdir/qbit'
+    LANGUAGE C IMMUTABLE STRICT;
 CREATE OR REPLACE FUNCTION gin_extract_query_qbit(qbit, internal, int2, internal, internal)
     RETURNS internal
     AS '$libdir/qbit'
@@ -188,14 +246,14 @@ CREATE OR REPLACE FUNCTION gin_consistent_qbit(internal, int2, anyelement, int4,
     LANGUAGE C IMMUTABLE STRICT;
 
 CREATE OPERATOR CLASS qbit_gin_ops DEFAULT FOR TYPE qbit USING gin AS
-   OPERATOR         1       <,
-    OPERATOR        2       <=,
-    OPERATOR        3       =,
-    OPERATOR        4       >=,
-    OPERATOR        5       >,
+   OPERATOR         1       <  (qbit, int4),
+    OPERATOR        2       <= (qbit, int4),
+    OPERATOR        3       =  (qbit, int4),
+    OPERATOR        4       >= (qbit, int4),
+    OPERATOR        5       >  (qbit, int4),
     FUNCTION        1       pg_catalog.btint4cmp(integer,integer),
     FUNCTION        2       gin_extract_value_qbit(qbit, internal),
-    FUNCTION        3       gin_extract_query_qbit(qbit, internal, int2, internal, internal),
+    FUNCTION        3       gin_extract_query_int4(qbit, internal, int2, internal, internal),
     FUNCTION        4       gin_consistent_qbit(internal, int2, anyelement, int4, internal, internal),
 STORAGE         int4;
 

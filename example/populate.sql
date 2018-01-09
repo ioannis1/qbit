@@ -7,7 +7,7 @@ SELECT --public.random_string(4)
 --       i
       ( '('|| random() ||','|| random() || 'j)U+('|| random() || ',' || random() ||'j)D'  )::qbit
       --, qbit_new((100*random()::float, (100*random())::int,(100*random())::int,(100*random())::int) )
-FROM  generate_series(1,1e6) a(i);
+FROM  generate_series(1,6) a(i);
 
 ANALYZE bank;
 

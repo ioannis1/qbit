@@ -24,6 +24,62 @@ create_elem(int32 i)
 }
 
 Datum
+gin_extract_query_int4(PG_FUNCTION_ARGS)
+{
+        int32          phase     =  PG_GETARG_INT32(0);
+        int32          *nentries = (int32 *) PG_GETARG_POINTER(1);
+
+        Datum           *items ;
+        int32           size;
+        StrategyNumber  strategy = PG_GETARG_UINT16(2);
+
+	if (phase>100) phase=100;
+	if (phase<0)   phase=0;
+
+        *nentries   = 0;
+        switch (strategy)
+        {
+            case 3 : items = (Datum *) palloc(sizeof(Datum));
+                     items[0]  = create_elem(  phase );
+                     *nentries = 1;
+                     break;
+
+            case 2 : size  =   phase +1;
+                     items = (Datum *) palloc(sizeof(Datum)* size);
+                     for (int i=0; i<= phase; i++)  {
+                              items[i]   = create_elem( i);
+                             *nentries  += 1;
+                     }
+                     break;
+
+            case 1 : size  =   phase +1;
+                     items = (Datum *) palloc(sizeof(Datum)* size);
+                     for (int i=0; i< phase; i++)  {
+                              items[i]  = create_elem(i);
+                             *nentries += 1;
+                     }
+                     break;
+
+            case 4 : size  =   101 - phase;
+                     items = (Datum *) palloc(sizeof(Datum)* size);
+                     for (int i=phase; i<=90; i++)  {
+                              items[*nentries] = create_elem(i);
+                             *nentries        += 1;
+                     }
+                     break;
+
+            case 5 : size  =   101 -  phase;
+                     items = (Datum *) palloc(sizeof(Datum)* size);
+                     for (int i= phase+1; i<=90; i++)  {
+                              items[*nentries] = create_elem( i);
+                             *nentries        += 1;
+                     }
+                     break;
+        }
+        PG_RETURN_POINTER(items);
+}
+
+Datum
 gin_extract_query_qbit(PG_FUNCTION_ARGS)
 {
         Qbit           *query    = (Qbit *)  PG_GETARG_POINTER(0);
@@ -209,7 +265,7 @@ qbit_up_internal(Qbit *q)
      //angle   = latitude - up.y;
      //return cos (angle * (3.14159/180) );
      //return MAG_SQUARED(q->up);
-     return up.x;
+     return up.x * up.x;
 }
 
 Datum
@@ -233,8 +289,6 @@ qbit_cmp_internal( Qbit *a, Qbit *b )
 {
      float4   amag = MagSqr(a->up),  bmag=MagSqr(b->up);
 
- //    if (fabs(amag-bmag) < 0.01) return 0;
-
      if ( amag == bmag ) return 0 ;
      if ( amag < bmag  ) return -1;
      return 1 ;
@@ -250,7 +304,6 @@ qbit_cmp(PG_FUNCTION_ARGS)
 }
 
 
-
 Datum
 qbit_less(PG_FUNCTION_ARGS)
 {
@@ -260,8 +313,6 @@ qbit_less(PG_FUNCTION_ARGS)
         if (qbit_cmp_internal(a,b) == -1 ) PG_RETURN_BOOL(true);
         PG_RETURN_BOOL(false);
 }
-
-
 Datum
 qbit_less_equal(PG_FUNCTION_ARGS)
 {
@@ -271,9 +322,6 @@ qbit_less_equal(PG_FUNCTION_ARGS)
         if (qbit_cmp_internal(a,b) <= 0 ) PG_RETURN_BOOL(true);
         PG_RETURN_BOOL(false);
 }
-
-
-
 Datum
 qbit_equal(PG_FUNCTION_ARGS)
 {
@@ -283,8 +331,6 @@ qbit_equal(PG_FUNCTION_ARGS)
         if (qbit_cmp_internal(a,b) == 0 ) PG_RETURN_BOOL(true);
         PG_RETURN_BOOL(false);
 }
-
-
 Datum
 qbit_greater_equal(PG_FUNCTION_ARGS)
 {
@@ -294,8 +340,6 @@ qbit_greater_equal(PG_FUNCTION_ARGS)
         if (qbit_cmp_internal(a,b) >= 0 ) PG_RETURN_BOOL(true);
         PG_RETURN_BOOL(false);
 }
-
-
 Datum
 qbit_greater(PG_FUNCTION_ARGS)
 {
@@ -320,6 +364,66 @@ qbit_ket(PG_FUNCTION_ARGS)
 
         PG_RETURN_POINTER(result);
 }
+
+static int
+qbit_upness_cmp_internal( Qbit *a, int32 b )
+{
+     // compare probabilities
+     float4   amag = 100 * MagSqr(a->up);
+
+     if ( amag == b  ) return 0 ;
+     if ( amag  < b  ) return -1;
+     return 1 ;
+}
+Datum
+qbit_upness_less(PG_FUNCTION_ARGS)
+{
+        Qbit      *a = (Qbit *) PG_GETARG_POINTER(0);
+        int32      b = PG_GETARG_INT32(1);
+
+        if (qbit_upness_cmp_internal(a,b) < 0 ) PG_RETURN_BOOL(true);
+        PG_RETURN_BOOL(false);
+}
+Datum
+qbit_upness_less_equal(PG_FUNCTION_ARGS)
+{
+        Qbit      *a = (Qbit *) PG_GETARG_POINTER(0);
+        int32      b = PG_GETARG_INT32(1);
+
+        if (qbit_upness_cmp_internal(a,b) <= 0 ) PG_RETURN_BOOL(true);
+        PG_RETURN_BOOL(false);
+}
+Datum
+qbit_upness_equal(PG_FUNCTION_ARGS)
+{
+        Qbit      *a = (Qbit *) PG_GETARG_POINTER(0);
+        int32      b = PG_GETARG_INT32(1);
+
+        if (qbit_upness_cmp_internal(a,b) == 0 ) PG_RETURN_BOOL(true);
+        PG_RETURN_BOOL(false);
+}
+Datum
+qbit_upness_greater_equal(PG_FUNCTION_ARGS)
+{
+        Qbit      *a = (Qbit *) PG_GETARG_POINTER(0);
+        int32      b = PG_GETARG_INT32(1);
+
+        if (qbit_upness_cmp_internal(a,b) >= 0 ) PG_RETURN_BOOL(true);
+        PG_RETURN_BOOL(false);
+}
+Datum
+qbit_upness_greater(PG_FUNCTION_ARGS)
+{
+        Qbit      *a = (Qbit *) PG_GETARG_POINTER(0);
+        int32      b = PG_GETARG_INT32(1);
+
+        if (qbit_upness_cmp_internal(a,b) > 0 ) PG_RETURN_BOOL(true);
+        PG_RETURN_BOOL(false);
+}
+
+
+
+
 /*
 PG_FUNCTION_INFO_V1(qbit_recv);
 Datum

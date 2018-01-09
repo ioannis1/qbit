@@ -1,0 +1,49 @@
+                                                           QUERY PLAN                                                           
+--------------------------------------------------------------------------------------------------------------------------------
+ Sort  (cost=10935.14..11072.56 rows=54971 width=16) (actual time=19.158..20.133 rows=6342 loops=1)
+   Sort Key: coin
+   Sort Method: quicksort  Memory: 490kB
+   Buffers: shared hit=3716
+   ->  Bitmap Heap Scan on bank  (cost=514.03..6607.17 rows=54971 width=16) (actual time=1.845..14.684 rows=6342 loops=1)
+         Recheck Cond: (coin >= '0.95<19.03>U+0.31<90.00>D'::qbit)
+         Heap Blocks: exact=3703
+         Buffers: shared hit=3708
+         ->  Bitmap Index Scan on wave_gin  (cost=0.00..500.28 rows=54971 width=0) (actual time=1.325..1.325 rows=6342 loops=1)
+               Index Cond: (coin >= '0.95<19.03>U+0.31<90.00>D'::qbit)
+               Buffers: shared hit=5
+ Planning time: 0.616 ms
+ Execution time: 21.007 ms
+(13 rows)
+
+\timing off
+SET SEARCH_PATH TO  :path,public;
+SET CLIENT_MIN_MESSAGES = 'ERROR';
+begin;
+
+--set enable_seqscan = off;
+set qbit.style = 'polar';
+
+EXPLAIN (analyze, buffers)
+SELECT coin
+FROM bank
+WHERE coin  >= '(0.580,0.20j)U+(0.0,0.2j)D'::qbit
+ORDER BY coin
+==============
+WITHOUT ANY INDEX, seqscan  is 17x slower
+
+                                                    QUERY PLAN
+-------------------------------------------------------------------------------------------------------------------
+ Sort  (cost=22233.97..22371.40 rows=54971 width=16) (actual time=303.450..309.245 rows=55884 loops=1)
+   Sort Key: coin
+   Sort Method: quicksort  Memory: 4156kB
+   Buffers: shared hit=5414 dirtied=2106
+   ->  Seq Scan on bank  (cost=0.00..17906.00 rows=54971 width=16) (actual time=0.045..268.815 rows=55884 loops=1)
+         Filter: (coin >= '0.95<19.03>U+0.31<90.00>D'::qbit)
+         Rows Removed by Filter: 944116
+         Buffers: shared hit=5406 dirtied=2106
+ Planning time: 0.482 ms
+ Execution time: 313.541 ms
+(10 rows)
+
+
+
