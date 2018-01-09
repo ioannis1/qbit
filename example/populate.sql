@@ -1,13 +1,21 @@
 \timing off
 SET SEARCH_PATH TO :path,public;
 
+/*
+INSERT INTO bank
+SELECT --public.random_string(4)
+--       i
+      ( '('|| i-10 ||','|| i+20 || 'j)U+('|| i+40 || ',' || 40 ||'j)D'  )::qbit
+      --, qbit_new((100*random()::float, (100*random())::int,(100*random())::int,(100*random())::int) )
+FROM  generate_series(1,100,2) a(i);
+*/
 
 INSERT INTO bank
 SELECT --public.random_string(4)
 --       i
       ( '('|| random() ||','|| random() || 'j)U+('|| random() || ',' || random() ||'j)D'  )::qbit
       --, qbit_new((100*random()::float, (100*random())::int,(100*random())::int,(100*random())::int) )
-FROM  generate_series(1,6) a(i);
+FROM  generate_series(1,1e6) a(i);
 
 ANALYZE bank;
 

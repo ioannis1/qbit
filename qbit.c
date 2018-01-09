@@ -11,8 +11,8 @@ gin_extract_value_qbit(PG_FUNCTION_ARGS)
         Datum      *entries  = (Datum *) palloc(sizeof(Datum) * 1);
 	int32      upness;
 
-	upness     = 100*qbit_up_internal(item);
-        entries[0] = Int32GetDatum( round(upness) );
+	upness     = (int32) round(100*qbit_up_internal(item) );
+        entries[0] = Int32GetDatum( upness );
         *nentries  = 1;
         PG_RETURN_POINTER(entries);
 }
@@ -26,51 +26,51 @@ create_elem(int32 i)
 Datum
 gin_extract_query_int4(PG_FUNCTION_ARGS)
 {
-        int32          phase     =  PG_GETARG_INT32(0);
+        int32          probab     =  PG_GETARG_INT32(0);
         int32          *nentries = (int32 *) PG_GETARG_POINTER(1);
 
         Datum           *items ;
         int32           size;
         StrategyNumber  strategy = PG_GETARG_UINT16(2);
 
-	if (phase>100) phase=100;
-	if (phase<0)   phase=0;
+	if (probab>100) probab=100;
+	if (probab<0)   probab=0;
 
         *nentries   = 0;
         switch (strategy)
         {
             case 3 : items = (Datum *) palloc(sizeof(Datum));
-                     items[0]  = create_elem(  phase );
+                     items[0]  = create_elem(  probab );
                      *nentries = 1;
                      break;
 
-            case 2 : size  =   phase +1;
+            case 2 : size  =   probab +1;
                      items = (Datum *) palloc(sizeof(Datum)* size);
-                     for (int i=0; i<= phase; i++)  {
+                     for (int i=0; i<= probab; i++)  {
                               items[i]   = create_elem( i);
                              *nentries  += 1;
                      }
                      break;
 
-            case 1 : size  =   phase +1;
+            case 1 : size  =   probab +1;
                      items = (Datum *) palloc(sizeof(Datum)* size);
-                     for (int i=0; i< phase; i++)  {
+                     for (int i=0; i< probab; i++)  {
                               items[i]  = create_elem(i);
                              *nentries += 1;
                      }
                      break;
 
-            case 4 : size  =   101 - phase;
+            case 4 : size  =   101 - probab;
                      items = (Datum *) palloc(sizeof(Datum)* size);
-                     for (int i=phase; i<=90; i++)  {
+                     for (int i=probab; i<=100; i++)  {
                               items[*nentries] = create_elem(i);
                              *nentries        += 1;
                      }
                      break;
 
-            case 5 : size  =   101 -  phase;
+            case 5 : size  =   100  -  probab;
                      items = (Datum *) palloc(sizeof(Datum)* size);
-                     for (int i= phase+1; i<=90; i++)  {
+                     for (int i= probab+1; i<=100; i++)  {
                               items[*nentries] = create_elem( i);
                              *nentries        += 1;
                      }
@@ -265,7 +265,7 @@ qbit_up_internal(Qbit *q)
      //angle   = latitude - up.y;
      //return cos (angle * (3.14159/180) );
      //return MAG_SQUARED(q->up);
-     return up.x * up.x;
+     return up.x ;
 }
 
 Datum
@@ -369,7 +369,7 @@ static int
 qbit_upness_cmp_internal( Qbit *a, int32 b )
 {
      // compare probabilities
-     float4   amag = 100 * MagSqr(a->up);
+     float4   amag = 100 * ( (a->up.x*a->up.x)+(a->up.y*a->up.y));
 
      if ( amag == b  ) return 0 ;
      if ( amag  < b  ) return -1;
