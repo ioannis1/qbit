@@ -1,0 +1,14 @@
+                                                             QUERY PLAN                                                              
+-------------------------------------------------------------------------------------------------------------------------------------
+ Bitmap Heap Scan on bank  (cost=5631.00..17287.00 rows=500000 width=16) (actual time=1268.982..1971.078 rows=5340 loops=1)
+   Recheck Cond: (coin > '99'::text)
+   Rows Removed by Index Recheck: 994660
+   Heap Blocks: exact=5406
+   Buffers: shared hit=5846
+   ->  Bitmap Index Scan on wave_gin  (cost=0.00..5506.00 rows=500000 width=0) (actual time=1268.042..1268.042 rows=1000000 loops=1)
+         Index Cond: (coin > '99'::text)
+         Buffers: shared hit=440
+ Planning time: 1.059 ms
+ Execution time: 1971.793 ms
+(10 rows)
+

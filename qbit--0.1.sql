@@ -240,11 +240,43 @@ CREATE OR REPLACE FUNCTION gin_extract_query_qbit(qbit, internal, int2, internal
     AS '$libdir/qbit'
     LANGUAGE C IMMUTABLE STRICT;
 
+CREATE OR REPLACE FUNCTION gin_extract_query_text(qbit, internal, int2, internal, internal)
+    RETURNS internal
+    AS '$libdir/qbit'
+    LANGUAGE C IMMUTABLE STRICT;
+
 CREATE OR REPLACE FUNCTION gin_consistent_qbit(internal, int2, anyelement, int4, internal, internal)
     RETURNS bool
     AS '$libdir/qbit'
     LANGUAGE C IMMUTABLE STRICT;
 
+CREATE OR REPLACE FUNCTION qbit_greater_text(qbit,text)
+    RETURNS boolean
+    AS '$libdir/qbit'
+    LANGUAGE C IMMUTABLE STRICT;
+
+
+CREATE OPERATOR > (
+    LEFTARG   = qbit,
+    RIGHTARG  = text,
+    PROCEDURE = qbit_greater_text
+);
+
+CREATE OPERATOR < (
+    LEFTARG   = qbit,
+    RIGHTARG  = text,
+    PROCEDURE = qbit_greater_text
+);
+
+CREATE OPERATOR CLASS qbit_gin_ops DEFAULT FOR TYPE qbit USING gin AS
+    OPERATOR        1       < (qbit, text),
+    OPERATOR        5       > (qbit, text),
+    FUNCTION        1       pg_catalog.btint4cmp(integer,integer),
+    FUNCTION        2       gin_extract_value_qbit(qbit, internal),
+    FUNCTION        3       gin_extract_query_text(qbit, internal, int2, internal, internal),
+    FUNCTION        4       gin_consistent_qbit(internal, int2, anyelement, int4, internal, internal),
+STORAGE         int4;
+/*
 CREATE OPERATOR CLASS qbit_gin_ops DEFAULT FOR TYPE qbit USING gin AS
    OPERATOR         1       <  (qbit, int4),
     OPERATOR        2       <= (qbit, int4),
@@ -256,4 +288,4 @@ CREATE OPERATOR CLASS qbit_gin_ops DEFAULT FOR TYPE qbit USING gin AS
     FUNCTION        3       gin_extract_query_int4(qbit, internal, int2, internal, internal),
     FUNCTION        4       gin_consistent_qbit(internal, int2, anyelement, int4, internal, internal),
 STORAGE         int4;
-
+*/

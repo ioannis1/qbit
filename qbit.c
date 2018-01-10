@@ -2,6 +2,8 @@
 
 #include "qbit.h"
 
+PG_FUNCTION_INFO_V1(qbit_greater_text);
+PG_FUNCTION_INFO_V1(gin_extract_query_text);
 
 Datum
 gin_extract_value_qbit(PG_FUNCTION_ARGS)
@@ -21,6 +23,35 @@ Datum
 create_elem(int32 i)
 {
       PG_RETURN_INT32(i);
+}
+
+Datum
+gin_extract_query_text(PG_FUNCTION_ARGS)
+{
+        text                *val = (text *) PG_GETARG_TEXT_PP(1);
+        int32          *nentries = (int32 *) PG_GETARG_POINTER(1);
+        StrategyNumber  strategy = PG_GETARG_UINT16(2);
+        int32           probab, size; 
+        Datum           *items   = NULL;
+        char            *str;
+       
+        str     = VARDATA_ANY(val);
+        probab = atoi(str);
+	if (probab>100) probab=100;
+	if (probab<0)   probab=0;
+
+        *nentries   = 0;
+        switch (strategy)
+        {
+            case 5 : size  =   101  -  probab;
+                     items = (Datum *) palloc(sizeof(Datum)* size);
+                     for (int i= probab; i<=100; i++)  {
+                              items[*nentries] = create_elem( i);
+                             *nentries        += 1;
+                     }
+                     break;
+        }
+        PG_RETURN_POINTER(items);
 }
 
 Datum
@@ -137,7 +168,7 @@ gin_consistent_qbit(PG_FUNCTION_ARGS)
 {
         bool           *recheck = (bool *) PG_GETARG_POINTER(5);
 
-        *recheck = false;
+        *recheck = true;
         PG_RETURN_BOOL(true);
 }
 
@@ -422,6 +453,15 @@ qbit_upness_greater(PG_FUNCTION_ARGS)
 }
 
 
+Datum
+qbit_greater_text(PG_FUNCTION_ARGS)
+{
+        Qbit     *a = (Qbit *) PG_GETARG_POINTER(0);
+        text   *val = (text *) PG_GETARG_TEXT_PP(1);
+
+        char   *str = VARDATA_ANY(val);
+        PG_RETURN_BOOL( (100* qbit_up_internal(a)) > atoi(str)  );
+}
 
 
 /*

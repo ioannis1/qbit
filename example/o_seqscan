@@ -1,3 +1,13 @@
+                                                         QUERY PLAN                                                          
+-----------------------------------------------------------------------------------------------------------------------------
+ Seq Scan on bank  (cost=10000000000.00..10000017906.00 rows=500000 width=16) (actual time=0.234..653.502 rows=5340 loops=1)
+   Filter: (coin > '99'::text)
+   Rows Removed by Filter: 994660
+   Buffers: shared hit=5406
+ Planning time: 0.435 ms
+ Execution time: 654.522 ms
+(6 rows)
+
 \timing off
 SET SEARCH_PATH TO  :path,public;
 SET CLIENT_MIN_MESSAGES = 'ERROR';

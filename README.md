@@ -30,3 +30,7 @@ SELECT '(1,2j)U+(3,4)D' > '(2,2j)U+(1,2j)D'::qbit              =>   false
 SELECT '(1,2j)U+(3,4)D' >= '(2,2j)U+(1,2j)D'::qbit             =>   false
 
 SELECT '(1,2j)U+(3,4)D' = '(1,2j)U+(3,4j)D'::qbit              =>  true
+
+SELECT qbit_greater_text(qbit_new(1,2,1,2),'49')               =>  true
+
+SELECT qbit_greater_text(qbit_new(1,2,1,2),'51')               =>  false
