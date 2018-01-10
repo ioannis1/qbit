@@ -7,10 +7,10 @@ set enable_seqscan = off;
 --set enable_indexscan = off;
 set qbit.style = 'probability';
 
-EXPLAIN (analyze, buffers)
+--EXPLAIN (analyze, buffers)
 SELECT coin
 FROM bank
-WHERE coin  > '99'::text
+WHERE coin  < '10'::text
 ;
 
 

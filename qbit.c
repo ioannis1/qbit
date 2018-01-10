@@ -3,6 +3,7 @@
 #include "qbit.h"
 
 PG_FUNCTION_INFO_V1(qbit_greater_text);
+PG_FUNCTION_INFO_V1(qbit_less_text);
 PG_FUNCTION_INFO_V1(gin_extract_query_text);
 
 Datum
@@ -48,6 +49,13 @@ gin_extract_query_text(PG_FUNCTION_ARGS)
                      for (int i= probab; i<=100; i++)  {
                               items[*nentries] = create_elem( i);
                              *nentries        += 1;
+                     }
+                     break;
+            default : size  =   probab + 1;
+                     items = (Datum *) palloc(sizeof(Datum)* size);
+                     for (int i=0; i< probab; i++)  {
+                              items[i]  = create_elem(i);
+                             *nentries += 1;
                      }
                      break;
         }
@@ -463,6 +471,15 @@ qbit_greater_text(PG_FUNCTION_ARGS)
         PG_RETURN_BOOL( (100* qbit_up_internal(a)) > atoi(str)  );
 }
 
+Datum
+qbit_less_text(PG_FUNCTION_ARGS)
+{
+        Qbit     *a = (Qbit *) PG_GETARG_POINTER(0);
+        text   *val = (text *) PG_GETARG_TEXT_PP(1);
+
+        char   *str = VARDATA_ANY(val);
+        PG_RETURN_BOOL( (100* qbit_up_internal(a)) < atoi(str)  );
+}
 
 /*
 PG_FUNCTION_INFO_V1(qbit_recv);

@@ -254,6 +254,10 @@ CREATE OR REPLACE FUNCTION qbit_greater_text(qbit,text)
     RETURNS boolean
     AS '$libdir/qbit'
     LANGUAGE C IMMUTABLE STRICT;
+CREATE OR REPLACE FUNCTION qbit_less_text(qbit,text)
+    RETURNS boolean
+    AS '$libdir/qbit'
+    LANGUAGE C IMMUTABLE STRICT;
 
 
 CREATE OPERATOR > (
@@ -265,11 +269,11 @@ CREATE OPERATOR > (
 CREATE OPERATOR < (
     LEFTARG   = qbit,
     RIGHTARG  = text,
-    PROCEDURE = qbit_greater_text
+    PROCEDURE = qbit_less_text
 );
 
 CREATE OPERATOR CLASS qbit_gin_ops DEFAULT FOR TYPE qbit USING gin AS
-    OPERATOR        1       < (qbit, text),
+--    OPERATOR        1       < (qbit, text),
     OPERATOR        5       > (qbit, text),
     FUNCTION        1       pg_catalog.btint4cmp(integer,integer),
     FUNCTION        2       gin_extract_value_qbit(qbit, internal),
